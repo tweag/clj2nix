@@ -198,7 +198,7 @@ let repos = [" (repos-nix mvn-repos) " ];
                      (map (fn [alias-data] (:extra-deps alias-data)))
                      (remove nil?)
                      (into []))
-        deps-to-resolve (into (:deps deps-edn-data)
+        deps-to-resolve (into (or (:deps deps-edn-data) {})
                               (reduce into [] aliases))
         deps-edn-data (assoc deps-edn-data
                              :deps deps-to-resolve
