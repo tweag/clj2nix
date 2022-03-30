@@ -116,7 +116,7 @@ let repos = [" (repos-nix mvn-repos) " ];
 (defn- resolve-sha512 [filepath]
   (assert (.exists (io/as-file filepath))
           (str filepath " " "doesn't exists."))
-  (subs (:out (sh "sha512sum" filepath)) 0 128))
+  (string/trim (:out (sh "nix-hash" "--type" "sha512" "--flat" filepath))))
 
 (defn- generate-items [deps]
   (->> (seq deps)
