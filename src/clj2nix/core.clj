@@ -108,13 +108,9 @@ let repos = [" (repos-nix mvn-repos) " ];
       [name name classifier]
       [(first split) name classifier])))
 
-(defn- resolve-git-sha256 [git-url rev]
-  (let [unpack? (or (re-find #"\.tar.gz$" git-url)
-                    (re-find #"\.zip$" git-url)
-                    (re-find #"\.tar$" git-url))
-        result  (:out (sh "nix-prefetch-git"
-                          "--url" git-url
-                          "--rev" rev))]
+(defn- resolve-git-sha256 [git-url]
+  (let [result  (:out (sh "nix-prefetch-git"
+                          "--url" git-url))]
     (get (json/read-str result) "sha256")))
 
 (defn- resolve-sha512 [filepath]
@@ -148,7 +144,7 @@ let repos = [" (repos-nix mvn-repos) " ];
                                              artifactID
                                              (:git/url dep)
                                              (or (:sha dep) (:git/sha dep))
-                                             (resolve-git-sha256 (:git/url dep) (or (:sha dep) (:git/sha dep)))
+                                             (resolve-git-sha256 (:git/url dep))
                                              (git-source-paths dep)))
                        :else      (conj
                                    acc
