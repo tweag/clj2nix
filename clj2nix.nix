@@ -42,7 +42,6 @@ in stdenv.mkDerivation rec {
       --add-flags "-cp" \
       --add-flags "${classp}" \
       --add-flags "clj2nix.core" \
-      --add-flags "${version}" \
       --prefix PATH : "$PATH:${lib.makeBinPath [ coreutils nix-prefetch-git ]}"
   '';
 }
