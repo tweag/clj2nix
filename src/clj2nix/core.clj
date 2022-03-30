@@ -60,7 +60,8 @@
                    :url (:git/url dep)
                    :rev (or (:sha dep) (:git/sha dep))
                    :sha256 (resolve-git-sha256 (:deps/root dep))
-                   :source-paths (git-source-paths dep)})
+                   :source-paths (git-source-paths dep)
+                   :dependents (get dep :dependents [])})
       :else      (conj
                   acc
                   {:type "maven"
@@ -70,7 +71,8 @@
                    :groupId groupID
                    :version (:mvn/version dep)
                    :classifier classifier
-                   :sha512 (resolve-sha512 (first (:paths dep)))}))))
+                   :sha512 (resolve-sha512 (first (:paths dep)))
+                   :dependents (get dep :dependents [])}))))
 
 (defn generate-json
   [{:keys [resolved-deps mvn-repos]}]
