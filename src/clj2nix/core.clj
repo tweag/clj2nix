@@ -7,10 +7,9 @@
             [clojure.edn :as edn]
             [clojure.data.json :as json]
             [clojure.java.io :as io]
+            [clojure.tools.gitlibs.config :as glConfig]
+            [clojure.tools.gitlibs.impl :as glImpl]
             [clojure.java.shell :refer [sh]]))
-
-(defn- git-source-paths [{:keys [paths] :deps/keys [root]}]
-  (map #(string/replace-first % root "") paths))
 
 (defn- resolve-artifact-and-group [name]
   (let [split (string/split (str name) #"/")
@@ -21,6 +20,12 @@
     (if (= 1 (count split))
       [name name classifier]
       [(first split) name classifier])))
+
+(defn- clean-url [url]
+  (string/replace-first
+    (str (glImpl/git-dir url))
+    (str (:gitlibs/dir @glConfig/CONFIG) "/")
+    ""))
 
 (defn- resolve-git-sha256 [git-url]
   (let [result  (:out (sh "nix-prefetch-git"
@@ -51,34 +56,36 @@
                               " argument extraClasspaths in "
                               " makeClasspaths if needed.")
                      acc)
+      ; TODO: Throw error when :git/tag is specified, because this would fail
+      ; at runtime, see https://clojure.atlassian.net/browse/TDEPS-223
       git-dep?  (conj
                   acc
-                  {:type "git"
-                   ; TODO: Can name be omitted?
-                   ; :name name
-                   :artifactId artifactID
-                   :url (:git/url dep)
-                   :rev (or (:sha dep) (:git/sha dep))
-                   :sha256 (resolve-git-sha256 (:deps/root dep))
-                   :source-paths (git-source-paths dep)
-                   :dependents (get dep :dependents [])})
+                  {name
+                   {:type "git"
+                    :dependents (get dep :dependents [])
+                    ; Below properties are needed by Nix specifically for Git
+                    :url (:git/url dep)
+                    :namespace (namespace name)
+                    :cleanUrl (clean-url (:git/url dep))
+                    :rev (or (:sha dep) (:git/sha dep))
+                    :sha256 (resolve-git-sha256 (:deps/root dep))}})
       :else      (conj
                   acc
-                  {:type "maven"
-                   ; TODO: Can name be omitted?
-                   ; :name (str groupID "/" artifactID)
-                   :artifactId artifactID
-                   :groupId groupID
-                   :version (:mvn/version dep)
-                   :classifier classifier
-                   :sha512 (resolve-sha512 (first (:paths dep)))
-                   :dependents (get dep :dependents [])}))))
+                  {name
+                   {:type "maven"
+                    :dependents (get dep :dependents [])
+                    ; Below properties are needed by Nix specifically for Maven
+                    :artifactId artifactID
+                    :groupId groupID
+                    :version (:mvn/version dep)
+                    :classifier classifier
+                    :sha512 (resolve-sha512 (first (:paths dep)))}}))))
 
 (defn generate-json
   [{:keys [resolved-deps mvn-repos]}]
   (json/write-str
     {:repos mvn-repos
-     :packages (reduce generate-item [] (seq resolved-deps))}
+     :packages (reduce generate-item {} (seq resolved-deps))}
     :indent true
     :escape-slash false))
 
