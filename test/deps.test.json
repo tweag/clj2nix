@@ -11,7 +11,16 @@
     }
   },
   "packages": {
-    "clj-time": {
+    "org.clojure/clojure": {
+      "type": "maven",
+      "dependents": [],
+      "artifactId": "clojure",
+      "groupId": "org.clojure",
+      "version": "1.10.3",
+      "classifier": null,
+      "sha512": "2y9pn8krl67v2xkzyss2aziry16gcapikjiad9gv4jj854qi0xg3y5dz089h3g8na5b5kwbphcyk5lbcal7grj49xaqz69d4swngdab"
+    },
+    "clj-time/clj-time": {
       "type": "maven",
       "dependents": [],
       "artifactId": "clj-time",
@@ -20,41 +29,18 @@
       "classifier": null,
       "sha512": "3vs3x36mcl8sl348xvlrv2s1g9ff6604ad593idr1d0fimc2ypmiixhq52bgdwagxr7c304malz4039qganvfg53wyjvrwx3m5jl0dq"
     },
-    "data.csv": {
+    "org.clojure/data.csv": {
       "type": "git",
       "dependents": [],
       "url": "https://github.com/clojure/data.csv.git",
-      "namespace": "org.clojure",
       "cleanUrl": "_repos/https/github.com/clojure/data.csv",
       "rev": "e5beccad0bafdb8e78f19cba481d4ecef5fabf36",
       "sha256": "021yhc19biycrdcyfak2hyy6jncrw3fhkqzd1jr77rid3f54nqx0"
     },
-    "joda-time": {
+    "org.clojure/spec.alpha": {
       "type": "maven",
       "dependents": [
-        "clj-time"
-      ],
-      "artifactId": "joda-time",
-      "groupId": "joda-time",
-      "version": "2.9.7",
-      "classifier": null,
-      "sha512": "20flyrv7w2zczlwzhbsm0hx2hiqmm0rxrzj9m1wk2mpxpazf506q5h2bfsp40k3c3acdx26x56dg8iih9k99f0sb5n5bcpr63s3sxp1"
-    },
-    "clojure": {
-      "type": "maven",
-      "dependents": [
-        "data.csv"
-      ],
-      "artifactId": "clojure",
-      "groupId": "org.clojure",
-      "version": "1.10.3",
-      "classifier": null,
-      "sha512": "2y9pn8krl67v2xkzyss2aziry16gcapikjiad9gv4jj854qi0xg3y5dz089h3g8na5b5kwbphcyk5lbcal7grj49xaqz69d4swngdab"
-    },
-    "spec.alpha": {
-      "type": "maven",
-      "dependents": [
-        "clojure"
+        "org.clojure/clojure"
       ],
       "artifactId": "spec.alpha",
       "groupId": "org.clojure",
@@ -62,16 +48,27 @@
       "classifier": null,
       "sha512": "1rjl96l3kfn17i6iwhnas8ml7fcr2n95vjjdm73xmk4a07w9mpcv2m9a8nzw46mx06q471msjwbsz7xxflkjwfj68pgac2mflxdqh07"
     },
-    "core.specs.alpha": {
+    "org.clojure/core.specs.alpha": {
       "type": "maven",
       "dependents": [
-        "clojure"
+        "org.clojure/clojure"
       ],
       "artifactId": "core.specs.alpha",
       "groupId": "org.clojure",
       "version": "0.2.56",
       "classifier": null,
       "sha512": "2ss9pi7lvxghsay5qiym2n3lrvjymcnlk4l9ry9pd3k9v8pna9b5d1inzxya8w9bg070hdlcvm5ji68vkfc7a5rsrydk5iqjr0agln1"
+    },
+    "joda-time/joda-time": {
+      "type": "maven",
+      "dependents": [
+        "clj-time/clj-time"
+      ],
+      "artifactId": "joda-time",
+      "groupId": "joda-time",
+      "version": "2.9.7",
+      "classifier": null,
+      "sha512": "20flyrv7w2zczlwzhbsm0hx2hiqmm0rxrzj9m1wk2mpxpazf506q5h2bfsp40k3c3acdx26x56dg8iih9k99f0sb5n5bcpr63s3sxp1"
     }
   }
 }

@@ -46,34 +46,24 @@
             (str name " has not been fetched locally."
                  " Make sure that all dependencies exist locally."))
     (cond
-      local-dep? (do (println "Warning: " name
-                              " is a local dependency."
-                              " All its remote dependencies will "
-                              " be resolved, but you need to add the "
-                              " jar/dir manually as a source to your "
-                              " nix-expression for it to be included."
-                              " As well as append its classpath via the "
-                              " argument extraClasspaths in "
-                              " makeClasspaths if needed.")
-                     acc)
+      local-dep? acc
       ; TODO: Throw error when :git/tag is specified, because this would fail
       ; at runtime, see https://clojure.atlassian.net/browse/TDEPS-223
       git-dep?  (conj
                   acc
-                  {name
+                  {(str name)
                    {:type "git"
-                    :dependents (get dep :dependents [])
+                    :dependents (map str (get dep :dependents []))
                     ; Below properties are needed by Nix specifically for Git
                     :url (:git/url dep)
-                    :namespace (namespace name)
                     :cleanUrl (clean-url (:git/url dep))
                     :rev (or (:sha dep) (:git/sha dep))
                     :sha256 (resolve-git-sha256 (:deps/root dep))}})
       :else      (conj
                   acc
-                  {name
+                  {(str name)
                    {:type "maven"
-                    :dependents (get dep :dependents [])
+                    :dependents (map str (get dep :dependents []))
                     ; Below properties are needed by Nix specifically for Maven
                     :artifactId artifactID
                     :groupId groupID
@@ -116,26 +106,16 @@
         (parse-opts (into [] (or opts [])) cli-options)
         deps-edn-data (edn/read-string (slurp deps-edn-path))
         mvn-repos (get deps-edn-data :mvn/repos mvn/standard-repos)
-        aliases (->> (:alias options)
-                     (map (fn [alias] (get-in deps-edn-data [:aliases alias])))
-                     (map (fn [alias-data] (:extra-deps alias-data)))
-                     (remove nil?)
-                     (into []))
-        deps-to-resolve (into (or (:deps deps-edn-data) {})
-                              (reduce into [] aliases))
-        deps-edn-data (assoc deps-edn-data
-                             :deps deps-to-resolve
-                             :mvn/repos mvn-repos)
-        resolved-deps (deps/resolve-deps deps-edn-data nil)]
-    (when (some #(not (contains? (:aliases deps-edn-data) %)) (:alias options))
-      (println "Warning: non-existent alias was provided"
-               (remove #(get (into #{} (keys (:aliases deps-edn-data))) %) (:alias options))))
+        resolved (deps/create-basis
+                   {:project deps-edn-path
+                    :extra nil
+                    :aliases (:alias options)})]
     (cond
       errors (println "Error in clj2nix options:" errors)
       (:help options) (println (usage))
       :else (do
               (spit output-path
                (generate-json
-                {:resolved-deps resolved-deps
+                {:resolved-deps (:libs resolved)
                  :mvn-repos mvn-repos})))))
   (System/exit 0))
