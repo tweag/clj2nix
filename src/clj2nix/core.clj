@@ -35,7 +35,7 @@
 (defn- resolve-sha512 [filepath]
   (assert (.exists (io/as-file filepath))
           (str filepath " " "doesn't exists."))
-  (string/trim (:out (sh "nix-hash" "--type" "sha512" "--flat" filepath))))
+  (string/trim (:out (sh "nix-hash" "--type" "sha512" "--base32" "--flat" filepath))))
 
 (defn- generate-item [acc [name dep]]
   (let [
