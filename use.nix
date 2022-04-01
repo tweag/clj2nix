@@ -1,4 +1,5 @@
-{ jsonPath, pkgs }:
+pkgs:
+{ jsonPath }:
 let
   lib = pkgs.lib;
 
